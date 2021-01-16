@@ -1,29 +1,45 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import chi2_contingency
+from scipy.stats import f_oneway
+from scipy.stats import spearmanr
+from scipy.stats import shapiro
+from scipy.stats import norm
+from sklearn.preprocessing import LabelEncoder
+from scipy.stats import pearsonr
+from sklearn.datasets import make_classification
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import MinMaxScaler
+import matplotlib.pyplot as plt
 #country = "Unites States of America"
 country = 'United States of America'
 
 # Total COVID confirmed cases
-df_confirmed = pd.read_csv(
+data = pd.read_csv(
     "/home/tansen/my_files/labupdated/latest.csv")
 # df_confirmed.to_csv('global.csv')
-print(df_confirmed.country_name.unique())
-df_confirmed_country2 = df_confirmed[df_confirmed["country_name"] == country]
-df_confirmed_country2.index = pd.to_datetime(df_confirmed_country2['date'])
-del df_confirmed_country2['date']
+# print(df_confirmed.country_name.unique())
+data = data[data["country_name"] == country]
+data['Deaths'] = data['Deaths'] + 1
+data['Deaths'] = data['Deaths'].apply(np.log)
+data['Confirmed'] = data['Confirmed'] + 1
+data['Confirmed'] = data['Confirmed'].apply(np.log)
 
-# df_confirmed_country.plot(figsize=(10, 5), title="COVID confirmed cases")
-#
-# df_confirmed_country.tail(10)
-columns = ['Confirmed']
-df_confirmed_country = pd.DataFrame(df_confirmed_country2, columns=columns)
+data.index = pd.to_datetime(data['date'])
+data['mortality_rate'] = data['Deaths'] / data['Confirmed']
+del data['date']
+columns = ['mortality_rate']
+df_confirmed_country = pd.DataFrame(data, columns=columns)
 
 print("Total days in the dataset", len(df_confirmed_country))
 
 # Use data until 14 days before as training
-x = len(df_confirmed_country) - 30
+x = len(df_confirmed_country) - 90
 
 train = df_confirmed_country.iloc[:x]
 test = df_confirmed_country.iloc[x:]
@@ -97,7 +113,7 @@ current_batch = train_scaled[-seq_size:]  # Final data points in train
 current_batch = current_batch.reshape(1, seq_size, n_features)  # Reshape
 
 ## Predict future, beyond test dates
-future = 30  # Days
+future = 7  # Days
 for i in range(len(test) + future):
     current_pred = model.predict(current_batch)[0]
     prediction.append(current_pred)
@@ -116,7 +132,7 @@ for k in range(0, future):
 df_forecast = pd.DataFrame(columns=["actual_confirmed", "predicted"], index=time_series_array)
 
 df_forecast.loc[:, "predicted"] = rescaled_prediction[:, 0]
-df_forecast.loc[:, "actual_confirmed"] = test["Confirmed"]
+df_forecast.loc[:, "actual_confirmed"] = test["mortality_rate"]
 
 # Plot
 df_forecast.plot(title="Predictions for next 7 days")
