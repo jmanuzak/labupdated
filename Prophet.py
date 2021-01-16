@@ -119,7 +119,7 @@ def get_prophet_result(train, test ,column_1, column_2, month_lim, day_lim ,date
 	# df_p
 
 data = pd.read_csv('/home/tansen/my_files/dataScienceLab/latest.csv')
-data = data.query('country_name in ["France","Germany","United Kingdom"]')
+data = data.query('country_name in ["United States of America"]')
 data = data.groupby("date")[['Deaths_New','Recovered_New', 'Confirmed_New','Deaths','Confirmed', 'Recovered']].sum()
 data['date'] = data.index
 index = [i for i in range(len(data))]
