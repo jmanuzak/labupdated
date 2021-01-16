@@ -39,7 +39,7 @@ df_confirmed_country = pd.DataFrame(data, columns=columns)
 print("Total days in the dataset", len(df_confirmed_country))
 
 # Use data until 14 days before as training
-x = len(df_confirmed_country) - 90
+x = len(df_confirmed_country) - 120
 
 train = df_confirmed_country.iloc[:x]
 test = df_confirmed_country.iloc[x:]
