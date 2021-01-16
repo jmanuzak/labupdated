@@ -20,8 +20,9 @@ from pandas import DataFrame
 from fbprophet.plot import plot_plotly, plot_components_plotly
 from sklearn.metrics import mean_absolute_error
 
-data = pd.read_csv('/home/tansen/my files/dataScienceLab/latest.csv')
+data = pd.read_excel('/home/tansen/my_files/labupdated/First_Iteration.xlsx')
 data = data.query('country_name in ["Germany","France","United Kingdom"]')
+print(data.head(10))
 #data = data.query('country_name in ["India"]')
 
 

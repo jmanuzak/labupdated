@@ -20,8 +20,7 @@ import matplotlib.pyplot as plt
 country = 'United States of America'
 
 # Total COVID confirmed cases
-data = pd.read_csv(
-    "/home/tansen/my_files/labupdated/latest.csv")
+data = pd.read_excel('/home/tansen/my_files/labupdated/First_Iteration.xlsx')
 # df_confirmed.to_csv('global.csv')
 # print(df_confirmed.country_name.unique())
 data = data[data["country_name"] == country]
