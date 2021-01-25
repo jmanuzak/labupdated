@@ -21,15 +21,17 @@ country = 'United States of America'
 
 # Total COVID confirmed cases
 data = pd.read_excel('/home/tansen/my_files/labupdated/First_Iteration.xlsx')
+data = pd.read_csv('/home/tansen/my_files/dataScienceLab/latest.csv')
 # df_confirmed.to_csv('global.csv')
 # print(df_confirmed.country_name.unique())
+# data = data.groupby("date")[['Deaths_New','Recovered_New', 'Confirmed_New','Deaths','Confirmed', 'Recovered']].sum()
 data = data[data["country_name"] == country]
 data['Deaths'] = data['Deaths'] + 1
 data['Deaths'] = data['Deaths'].apply(np.log)
 data['Confirmed'] = data['Confirmed'] + 1
 data['Confirmed'] = data['Confirmed'].apply(np.log)
-
 data.index = pd.to_datetime(data['date'])
+data.groupby(by=[data.index,data.index.month, data.index.year]).sum()
 data['mortality_rate'] = data['Deaths'] / data['Confirmed']
 del data['date']
 columns = ['mortality_rate']
@@ -38,7 +40,7 @@ df_confirmed_country = pd.DataFrame(data, columns=columns)
 print("Total days in the dataset", len(df_confirmed_country))
 
 # Use data until 14 days before as training
-x = len(df_confirmed_country) - 120
+x = len(df_confirmed_country) - 14
 
 train = df_confirmed_country.iloc[:x]
 test = df_confirmed_country.iloc[x:]
@@ -80,8 +82,10 @@ from keras.layers import Dense, LSTM, Dropout, Activation
 # Define Model
 model = Sequential()
 model.add(LSTM(150, activation='relu', return_sequences=True, input_shape=(seq_size, n_features)))
-model.add(LSTM(64, activation='relu'))
-model.add(Dense(64))
+model.add(LSTM(64, activation='relu', return_sequences=True))
+model.add(LSTM(32, activation='relu', return_sequences=True))
+model.add(LSTM(16, activation='relu'))
+model.add(Dense(16))
 model.add(Dense(1))
 model.compile(optimizer='adam', loss='mean_squared_error')
 
@@ -91,7 +95,7 @@ print('Train...')
 
 history = model.fit_generator(train_generator,
                               validation_data=test_generator,
-                              epochs=50, steps_per_epoch=10)
+                              epochs=200, steps_per_epoch=10)
 
 # plot the training and validation accuracy and loss at each epoch
 loss = history.history['loss']
